@@ -39,6 +39,21 @@ class Stripped_str(Field_factory):
         return value.strip()
 
 
+class Keyword(Field_factory):
+    def __str__(self):
+        return "*" + self.value
+
+    def _constructor(self, value):
+        return value.lstrip("*")
+
+    def __eq__(self, other):
+        if isinstance(other, Field_factory):
+            return self.value == other.value
+        return self.value == other
+
+    def __hash__(self):
+        return hash(self.value)
+
 class Natural_number(Field_factory):
     limit = 0
     def __str__(self):

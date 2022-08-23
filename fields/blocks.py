@@ -1,4 +1,5 @@
 from utils import grouping_values_by_index
+from fields import Keyword
 from datasets import (
     Unit,
     Version,
@@ -136,6 +137,19 @@ class Multitype_mapping_block(Multitype_block):
         return self.header + [x.to_line() for x in self.items.values()]
 
 
+class Block_in_block(Block_base):
+    item_type = None
+    key_index = 0
+    key_type = Keyword
+
+    def to_lines(self):
+        return self.header + sum([x.to_lines() for x in self.items], [])
+
+#     @classmethod
+#     def from_lines(self):
+
+
+
 class bUnit(Singleline_block):
     item_type = Unit
     key = "UNIT"
@@ -219,7 +233,16 @@ class bStatic_load_case(Singleline_block):
 
 
 class bLoad_to_mass(Singleline_block):
-    pass
+    item_type = Load_to_mass
+    line_num = 1
+    key = "LOADTOMASS"
+
+    @classmethod
+    def from_lines(cls, lines):
+        if len(lines) == 2:
+            item = cls.item_type.from_line(lines)
+            return cls(item)
+        raise ValueError("Not convert loat to mass class. line num don't match.")
 
 
 class bSelfweight(Singleline_block):
@@ -321,3 +344,15 @@ if __name__ == "__main__":
         ]
     )
     print(sections.to_lines())
+
+    ltm = bLoad_to_mass.from_lines(
+        [
+            "XY, YES, YES, YES, YES, 9.806",
+            "DL, 1, LL(forE), 1, SL(forE), 1"
+        ]
+    )
+    print(ltm.to_lines())
+
+    key = Keyword("*TEST")
+    test = {"TEST": 1}
+    print(test[key])
